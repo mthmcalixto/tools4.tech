@@ -1,51 +1,76 @@
 'use client';
-
 import { useState } from 'react';
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueries, useQueryClient } from "@tanstack/react-query";
 import { AxiosConfig } from "../utils/axiosConfig";
 import Card from '../../components/Card';
 import { Toast } from '../../components/Toast';
 
-// Função para buscar os detalhes de uma ferramenta
+// Funções de fetch separadas para melhor reutilização
 async function fetchToolDetails(toolId) {
   const { data } = await AxiosConfig.get(`/tools/${toolId}`);
   return data;
 }
 
-// Função para buscar favoritos e seus detalhes
-async function fetchFavoritesWithDetails() {
-  // Primeiro, busca a lista de favoritos
-  const { data: favorites } = await AxiosConfig.get('/favorites');
-
-  // Depois, busca os detalhes de cada ferramenta
-  const favoritesWithTools = await Promise.all(
-    favorites.map(async (favorite) => {
-      const toolDetails = await fetchToolDetails(favorite.toolId);
-      return {
-        ...favorite,
-        tool: toolDetails
-      };
-    })
-  );
-
-  return favoritesWithTools;
+async function fetchFavorites() {
+  const { data } = await AxiosConfig.get('/favorites');
+  return data;
 }
 
 export default function Favorites() {
   const [toast, setToast] = useState(null);
+  const queryClient = useQueryClient();
 
-  const { data: favorites, isLoading, error, refetch } = useQuery({
-    queryKey: ["favorites-with-tools"],
-    queryFn: fetchFavoritesWithDetails,
+  // Query principal para favoritos
+  const favoritesQuery = useQuery({
+    queryKey: ["favorites"],
+    queryFn: fetchFavorites,
+    staleTime: 1000 * 60 * 5, // 5 minutos
+    cacheTime: 1000 * 60 * 30, // 30 minutos
   });
+
+  // Queries paralelas para detalhes das ferramentas
+  const toolQueries = useQueries({
+    queries: (favoritesQuery.data ?? []).map((favorite) => ({
+      queryKey: ["tool", favorite.toolId],
+      queryFn: () => fetchToolDetails(favorite.toolId),
+      staleTime: 1000 * 60 * 10, // 10 minutos
+      cacheTime: 1000 * 60 * 60, // 1 hora
+    })),
+    enabled: !!favoritesQuery.data,
+  });
+
+  // Combina os dados dos favoritos com os detalhes das ferramentas
+  const favorites = favoritesQuery.data?.map((favorite, index) => ({
+    ...favorite,
+    tool: toolQueries[index]?.data,
+  }));
+
+  const isLoading = favoritesQuery.isLoading || toolQueries.some(query => query.isLoading);
+  const error = favoritesQuery.error || toolQueries.some(query => query.error);
 
   const showToast = (message, type) => {
     setToast({ message, type });
   };
 
-  const handleFavoriteRemoved = async () => {
-    await refetch();
+  const handleFavoriteRemoved = async (favoriteId) => {
+    // Invalidação otimista do cache
+    await queryClient.invalidateQueries(["favorites"]);
+    // Remover imediatamente do cache para UI mais responsiva
+    queryClient.setQueryData(["favorites"], (old) =>
+      old?.filter(fav => fav.id !== favoriteId)
+    );
     showToast("Item removido dos favoritos", "success");
+  };
+
+  // Pré-fetch dos dados ao hover
+  const prefetchTool = async (toolId) => {
+    await queryClient.prefetchQuery(
+      ["tool", toolId],
+      () => fetchToolDetails(toolId),
+      {
+        staleTime: 1000 * 60 * 10,
+      }
+    );
   };
 
   if (isLoading) return (
@@ -74,14 +99,18 @@ export default function Favorites() {
       <h1 className="text-2xl font-bold mb-6">Meus Favoritos</h1>
       <div className="flex flex-wrap justify-between items-center gap-4">
         {favorites.map(favorite => (
-          <Card
+          <div
             key={favorite.id}
-            tool={favorite.tool}
-            showToast={showToast}
-            onFavoriteRemoved={handleFavoriteRemoved}
-            isFavorite={true}
-            favoriteId={favorite.id}
-          />
+            onMouseEnter={() => prefetchTool(favorite.tool?.id)}
+          >
+            <Card
+              tool={favorite.tool}
+              showToast={showToast}
+              onFavoriteRemoved={() => handleFavoriteRemoved(favorite.id)}
+              isFavorite={true}
+              favoriteId={favorite.id}
+            />
+          </div>
         ))}
       </div>
       {toast && (

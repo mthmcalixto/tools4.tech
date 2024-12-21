@@ -32,11 +32,11 @@ const options = {
         if (res.status === 200 || res.status === 201) {
           return true;
         } else {
-          console.error("Erro ao salvar usuário no backend");
+          console.error("Error saving user in backend");
           return false;
         }
       } catch (error) {
-        console.error("Erro ao conectar com o backend: ", error);
+        console.error("Error connecting to the backend: ", error);
         return false;
       }
     },
@@ -60,5 +60,4 @@ const options = {
 
 const handler = NextAuth(options);
 
-// Exportando o handler como GET e POST
 export { handler as GET, handler as POST };
