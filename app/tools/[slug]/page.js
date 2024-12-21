@@ -6,6 +6,7 @@ import { useQuery } from '@tanstack/react-query';
 import { AxiosConfig } from "../../utils/axiosConfig";
 import Card from '../../../components/Card';
 import { Toast } from '../../../components/Toast';
+import CardSkeleton from '../../../components/CardSkeleton'
 
 const fetchToolsByCategory = async (categoryId) => {
   if (!categoryId) return null;
@@ -33,7 +34,13 @@ export default function ToolsPage() {
   };
 
   if (isLoading) {
-    return <div className="flex justify-center items-center h-screen">Carregando...</div>;
+    return (
+      <div className="w-4/5 mx-auto py-8 flex flex-wrap items-center justify-between gap-12">
+        {[...Array(5)].map((_, index) => (
+          <CardSkeleton />
+        ))}
+      </div>
+    )
   }
 
   if (error) {
@@ -46,7 +53,7 @@ export default function ToolsPage() {
 
   return (
     <div className="w-4/5 mx-auto py-8">
-      <div className="flex flex-wrap justify-between items-start gap-4">
+      <div className="flex flex-wrap items-center justify-between gap-12">
         {tools?.map(tool => (
           <Card
             key={tool.id}
