@@ -4,6 +4,7 @@ import { useQuery, useQueries, useQueryClient } from "@tanstack/react-query";
 import { AxiosConfig } from "../utils/axiosConfig";
 import Card from '../../components/Card';
 import { Toast } from '../../components/Toast';
+import CardSkeleton from '@/components/CardSkeleton';
 
 // Funções de fetch separadas para melhor reutilização
 async function fetchToolDetails(toolId) {
@@ -75,7 +76,7 @@ export default function Favorites() {
 
   if (isLoading) return (
     <div className="flex justify-center items-center h-screen">
-      Carregando seus favoritos...
+      <CardSkeleton />
     </div>
   );
 
