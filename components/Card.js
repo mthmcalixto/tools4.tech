@@ -1,77 +1,76 @@
-'use client'
-import { useState } from "react"
-import Link from "next/link"
-import { useSession } from "next-auth/react"
-import { AxiosConfig } from "../app/utils/axiosConfig"
-import { Toast } from "./Toast"
-import useSWR from 'swr'
+'use client';
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import { useSession } from "next-auth/react";
+import { AxiosConfig } from "../app/utils/axiosConfig";
+import { Toast } from "./Toast";
+import useSWR from 'swr';
 
 // Função fetcher para o SWR
 const fetcher = async (url) => {
-	const response = await AxiosConfig.get(url)
-	return response.data
-}
+	const response = await AxiosConfig.get(url);
+	return response.data;
+};
 
 export default function Card({ tool, onFavoriteChange }) {
-	const { data: session, status } = useSession()
-	const [toast, setToast] = useState(null)
+	const { data: session, status } = useSession();
+	const [toast, setToast] = useState(null);
+	const [isFavorite, setIsFavorite] = useState(false);
 
-	// Usando SWR para gerenciar o estado de favorito
-	const { data: favoriteData, mutate } = useSWR(
-		status === "authenticated" && session?.user?.githubId
-			? `/favorites/check?userId=${session.user.githubId}&toolId=${tool.id}`
-			: null,
-		fetcher,
-		{
-			revalidateOnFocus: false, // Evita revalidação ao focar na janela
-			revalidateOnReconnect: false, // Evita revalidação ao reconectar
-			dedupingInterval: 60000, // Deduplica requisições em um intervalo de 1 minuto
+	useEffect(() => {
+		if (status === "authenticated" && session?.user?.githubId) {
+			// Consultar o status de favorito em segundo plano
+			fetchFavoriteStatus();
 		}
-	)
+	}, [session, status]);
 
-	const isFavorite = favoriteData?.isFavorite || false
+	const fetchFavoriteStatus = async () => {
+		try {
+			const response = await AxiosConfig.get(`/favorites/check?userId=${session.user.githubId}&toolId=${tool.id}`);
+			setIsFavorite(response.data.isFavorite);
+		} catch (error) {
+			console.error("Erro ao verificar favorito", error);
+		}
+	};
 
 	const handleFavoriteClick = async (e) => {
-		e.preventDefault()
-		e.stopPropagation()
+		e.preventDefault();
+		e.stopPropagation();
 
 		if (status !== "authenticated" || !session?.user?.githubId) {
-			setToast({ message: "Por favor, faça login para adicionar aos favoritos.", type: "error" })
-			return
+			setToast({ message: "Por favor, faça login para adicionar aos favoritos.", type: "error" });
+			return;
 		}
 
 		try {
+			const newFavoriteStatus = !isFavorite;
+
 			// Otimistic UI Update
-			await mutate({ isFavorite: !isFavorite }, false)
+			setIsFavorite(newFavoriteStatus);
 
 			const response = await AxiosConfig.post("/favorites/toggle", {
 				userId: session.user.githubId,
 				toolId: tool.id
-			})
-
-			const newFavoriteStatus = response.data.isFavorite
-
-			// Atualiza o cache com o valor real do servidor
-			await mutate({ isFavorite: newFavoriteStatus }, false)
+			});
 
 			setToast({
 				message: `${tool.name} ${newFavoriteStatus ? 'adicionado aos' : 'removido dos'} favoritos`,
 				type: "success"
-			})
+			});
 
 			if (onFavoriteChange) {
-				onFavoriteChange(tool.id, newFavoriteStatus)
+				onFavoriteChange(tool.id, newFavoriteStatus);
 			}
 		} catch (error) {
 			// Reverte o estado otimista em caso de erro
-			await mutate({ isFavorite }, false)
-			console.error("Erro ao atualizar favoritos:", error.response ? error.response.data : error.message)
-			setToast({ message: "Ocorreu um erro ao atualizar os favoritos. Por favor, tente novamente.", type: "error" })
+			setIsFavorite(isFavorite);
+			console.error("Erro ao atualizar favoritos:", error.response ? error.response.data : error.message);
+			setToast({ message: "Ocorreu um erro ao atualizar os favoritos. Por favor, tente novamente.", type: "error" });
 		}
-	}
+	};
 
 	if (status === "loading") {
-		return <div>Loading...</div>
+		return <div>Loading...</div>;
 	}
 
 	return (
@@ -112,5 +111,5 @@ export default function Card({ tool, onFavoriteChange }) {
 				/>
 			)}
 		</>
-	)
+	);
 }

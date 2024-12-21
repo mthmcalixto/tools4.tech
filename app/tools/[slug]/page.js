@@ -1,5 +1,4 @@
 'use client';
-
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
@@ -37,7 +36,7 @@ export default function ToolsPage() {
     return (
       <div className="w-4/5 mx-auto py-8 flex flex-wrap items-center justify-between gap-12">
         {[...Array(5)].map((_, index) => (
-          <CardSkeleton />
+          <CardSkeleton key={index} />
         ))}
       </div>
     )
@@ -72,3 +71,4 @@ export default function ToolsPage() {
     </div>
   );
 }
+
