@@ -4,7 +4,7 @@ import { useQuery, useQueries, useQueryClient } from "@tanstack/react-query";
 import { AxiosConfig } from "../utils/axiosConfig";
 import Card from '../../components/Card';
 import { Toast } from '../../components/Toast';
-import CardSkeleton from '@/components/CardSkeleton';
+import CardSkeleton from '../../components/CardSkeleton';
 
 // Funções de fetch separadas para melhor reutilização
 async function fetchToolDetails(toolId) {
