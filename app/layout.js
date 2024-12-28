@@ -7,6 +7,8 @@ import CategoryBar from "../components/CategoryBar";
 import { QueryProvider } from './providers';
 import { SessionProvider } from 'next-auth/react';
 import { usePathname } from 'next/navigation';
+import { Analytics } from "@vercel/analytics/react"
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
 export default function RootLayout({ children, session }) {
 	const pathname = usePathname();
@@ -52,6 +54,8 @@ export default function RootLayout({ children, session }) {
 							</div>
 						)}
 						{children}
+						<Analytics />
+						<SpeedInsights />
 					</QueryProvider>
 				</SessionProvider>
 			</body>
