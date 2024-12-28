@@ -10,7 +10,12 @@ import { usePathname } from 'next/navigation';
 
 export default function RootLayout({ children, session }) {
 	const pathname = usePathname();
-	const showCategoryBar = pathname !== '/contributors';
+
+	// Lista de endpoints que não devem exibir a CategoryBar
+	const excludedPaths = ['/contributors', '/addtools'];
+
+	// Verifica se o pathname atual está na lista de exclusão
+	const showCategoryBar = !excludedPaths.includes(pathname);
 
 	return (
 		<html lang="en" className="h-full">
