@@ -52,7 +52,7 @@ export default function ToolsPage() {
 
   return (
     <div className="w-4/5 mx-auto py-8">
-      <div className="flex flex-wrap items-center justify-between gap-12">
+      <div className="flex flex-wrap items-center justify-center gap-6">
         {tools?.map(tool => (
           <Card
             key={tool.id}

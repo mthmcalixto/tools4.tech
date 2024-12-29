@@ -9,7 +9,7 @@ const CreateToolPage = () => {
   const queryClient = useQueryClient();
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
-  const { register, handleSubmit, formState: { errors }, reset } = useForm({
+  const { register, handleSubmit, formState: { errors }, reset, watch } = useForm({
     defaultValues: {
       name: '',
       link: '',
@@ -17,6 +17,10 @@ const CreateToolPage = () => {
       categoryID: ''
     }
   });
+
+  // Watch the description field for the character counter
+  const descriptionValue = watch('description') || '';
+  const remainingChars = 230 - descriptionValue.length;
 
   // Fetch categories
   const { data: categories, isLoading: loadingCategories } = useQuery({
@@ -66,7 +70,6 @@ const CreateToolPage = () => {
         <div className="p-6">
           <h2 className="text-2xl font-bold mb-6">Add New Tool</h2>
 
-          {/* Exibe mensagens de sucesso ou erro */}
           {successMessage && (
             <div className="mb-4 p-3 bg-green-100 text-green-700 rounded-md">
               {successMessage}
@@ -86,8 +89,7 @@ const CreateToolPage = () => {
               <input
                 type="text"
                 {...register('name', { required: 'Name is required' })}
-                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.name ? 'border-red-500' : 'border-gray-300'
-                  }`}
+                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.name ? 'border-red-500' : 'border-gray-300'}`}
                 placeholder="Tool name"
               />
               {errors.name && (
@@ -102,8 +104,7 @@ const CreateToolPage = () => {
               <input
                 type="url"
                 {...register('link', { required: 'Link is required' })}
-                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.link ? 'border-red-500' : 'border-gray-300'
-                  }`}
+                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.link ? 'border-red-500' : 'border-gray-300'}`}
                 placeholder="https://..."
               />
               {errors.link && (
@@ -112,13 +113,24 @@ const CreateToolPage = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Description
-              </label>
+              <div className="flex justify-between items-center mb-1">
+                <label className="block text-sm font-medium text-gray-700">
+                  Description
+                </label>
+                <span className={`text-sm ${remainingChars < 0 ? 'text-red-500' : 'text-gray-500'}`}>
+                  {remainingChars} characters remaining
+                </span>
+              </div>
               <textarea
-                {...register('description', { required: 'Description is required' })}
+                {...register('description', {
+                  required: 'Description is required',
+                  maxLength: {
+                    value: 230,
+                    message: 'Description cannot exceed 230 characters'
+                  },
+                })}
                 rows="4"
-                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.description ? 'border-red-500' : 'border-gray-300'
+                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.description || remainingChars < 0 ? 'border-red-500' : 'border-gray-300'
                   }`}
                 placeholder="Tool description..."
               />
@@ -133,8 +145,7 @@ const CreateToolPage = () => {
               </label>
               <select
                 {...register('categoryID', { required: 'Category is required' })}
-                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.categoryID ? 'border-red-500' : 'border-gray-300'
-                  }`}
+                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.categoryID ? 'border-red-500' : 'border-gray-300'}`}
               >
                 <option value="">Select a category</option>
                 {categories?.map((category) => (
@@ -150,8 +161,8 @@ const CreateToolPage = () => {
 
             <button
               type="submit"
-              disabled={createTool.isPending}
-              className={`w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors ${createTool.isPending ? 'opacity-50 cursor-not-allowed' : ''
+              disabled={createTool.isPending || remainingChars < 0}
+              className={`w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors ${(createTool.isPending || remainingChars < 0) ? 'opacity-50 cursor-not-allowed' : ''
                 }`}
             >
               {createTool.isPending ? 'Creating...' : 'Create Tool'}
