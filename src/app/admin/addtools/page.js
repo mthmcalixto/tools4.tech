@@ -1,6 +1,6 @@
 'use client'
 
-import { AxiosConfig } from '@/src/utils'
+import { AxiosConfig } from '@/utils'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -85,7 +85,7 @@ const CreateToolPage = () => {
 
   return (
     <div className='max-w-2xl mx-auto p-4'>
-      <div className='bg-white shadow-sm rounded-lg'>
+      <div>
         <div className='p-6'>
           <h2 className='text-2xl font-bold mb-6'>Add New Tool</h2>
 
@@ -102,14 +102,14 @@ const CreateToolPage = () => {
 
           <form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
             <div>
-              <label className='block text-sm font-medium text-gray-700 mb-1'>
+              <label className='block text-sm font-medium text-gray-400 mb-1'>
                 Name
               </label>
               <input
                 type='text'
                 {...register('name', { required: 'Name is required' })}
                 className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-hidden focus:ring-2 focus:ring-blue-500 ${
-                  errors.name ? 'border-red-500' : 'border-gray-300'
+                  errors.name ? 'border-red-500' : 'border-neutral-800'
                 }`}
                 placeholder='Tool name'
               />
@@ -121,14 +121,14 @@ const CreateToolPage = () => {
             </div>
 
             <div>
-              <label className='block text-sm font-medium text-gray-700 mb-1'>
+              <label className='block text-sm font-medium text-gray-400 mb-1'>
                 Link
               </label>
               <input
                 type='url'
                 {...register('link', { required: 'Link is required' })}
                 className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-hidden focus:ring-2 focus:ring-blue-500 ${
-                  errors.link ? 'border-red-500' : 'border-gray-300'
+                  errors.link ? 'border-red-500' : 'border-neutral-800'
                 }`}
                 placeholder='https://...'
               />
@@ -141,7 +141,7 @@ const CreateToolPage = () => {
 
             <div>
               <div className='flex justify-between items-center mb-1'>
-                <label className='block text-sm font-medium text-gray-700'>
+                <label className='block text-sm font-medium text-gray-400'>
                   Description
                 </label>
                 <span
@@ -164,7 +164,7 @@ const CreateToolPage = () => {
                 className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-hidden focus:ring-2 focus:ring-blue-500 ${
                   errors.description || remainingChars < 0
                     ? 'border-red-500'
-                    : 'border-gray-300'
+                    : 'border-neutral-800'
                 }`}
                 placeholder='Tool description...'
               />
@@ -176,7 +176,7 @@ const CreateToolPage = () => {
             </div>
 
             <div>
-              <label className='block text-sm font-medium text-gray-700 mb-1'>
+              <label className='block text-sm font-medium text-gray-400 mb-1'>
                 Category
               </label>
               <select
@@ -184,7 +184,7 @@ const CreateToolPage = () => {
                   required: 'Category is required',
                 })}
                 className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-hidden focus:ring-2 focus:ring-blue-500 ${
-                  errors.categoryID ? 'border-red-500' : 'border-gray-300'
+                  errors.categoryID ? 'border-red-500' : 'border-neutral-800'
                 }`}
               >
                 <option value=''>Select a category</option>
@@ -204,7 +204,7 @@ const CreateToolPage = () => {
             <button
               type='submit'
               disabled={createTool.isPending || remainingChars < 0}
-              className={`w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors ${
+              className={`w-full bg-[#222] text-white py-2 px-4 rounded-md hover:opacity-50 focus:outline-hidden transition-colors cursor-pointer ${
                 createTool.isPending || remainingChars < 0
                   ? 'opacity-50 cursor-not-allowed'
                   : ''

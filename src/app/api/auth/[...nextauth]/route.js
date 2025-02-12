@@ -1,3 +1,4 @@
+import { AxiosConfig } from '@/utils'
 import NextAuth from 'next-auth'
 import GithubProvider from 'next-auth/providers/github'
 
@@ -29,6 +30,7 @@ const options = {
         })
 
         if (res.status === 200 || res.status === 201) {
+          user.role = res.data.role
           return true
         } else {
           console.error('Error saving user in backend')
@@ -39,10 +41,14 @@ const options = {
         return false
       }
     },
-    async jwt({ token, account, profile }) {
+    async jwt({ token, account, profile, user }) {
       if (account && profile) {
         token.githubId = parseInt(profile.id)
         token.avatar_url = profile.avatar_url
+      }
+
+      if (user?.role) {
+        token.role = user.role
       }
       return token
     },
@@ -50,11 +56,13 @@ const options = {
       if (session.user) {
         session.user.githubId = token.githubId
         session.user.avatar_url = token.avatar_url
+        session.user.role = token.role
       }
       return session
     },
   },
   debug: process.env.NODE_ENV === 'development',
+  secret: process.env.NEXTAUTH_SECRET,
 }
 
 const handler = NextAuth(options)
