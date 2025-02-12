@@ -43,7 +43,7 @@ export default async function Favorites() {
 
   const favorites = await getFavorites(session?.user?.githubId)
 
-  if (!favorites) {
+  if (!favorites || favorites.length === 0) {
     return (
       <div className='flex flex-col justify-center items-center h-screen'>
         <h2 className='text-xl font-semibold mb-4'>No favorites found</h2>
