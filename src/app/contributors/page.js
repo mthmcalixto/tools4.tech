@@ -26,9 +26,6 @@ export default async function Contributors() {
     )
   }
 
-export default async function Contributors() {
-  const data = await getContributors('mateusarcedev', 'tools4.tech')
- 
   return (
     <div className='bg-[#111] text-gray-300'>
       <main className='container mx-auto px-4 py-12'>

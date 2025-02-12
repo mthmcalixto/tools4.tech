@@ -2,7 +2,7 @@ import { AxiosConfig } from '@/utils'
 import NextAuth from 'next-auth'
 import GithubProvider from 'next-auth/providers/github'
 
-const options = {
+export const authOptions = {
   providers: [
     GithubProvider({
       clientId: process.env.GITHUB_ID,
@@ -65,6 +65,6 @@ const options = {
   secret: process.env.NEXTAUTH_SECRET,
 }
 
-const handler = NextAuth(options)
+const handler = NextAuth(authOptions)
 
 export { handler as GET, handler as POST }
