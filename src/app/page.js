@@ -53,7 +53,6 @@ export default async function Home() {
                   </span>
                 </div>
               )}
-
               <Link
                 href='/contributors'
                 className='flex flex-col items-center hover:text-white transition-colors duration-300'
