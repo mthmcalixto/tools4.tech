@@ -1,6 +1,8 @@
 import Navbar from '@/components/Navbar'
+import { cn } from '@/utils'
 import { Analytics } from '@vercel/analytics/react'
 import { SpeedInsights } from '@vercel/speed-insights/next'
+import { JetBrains_Mono } from 'next/font/google'
 import './globals.css'
 import { QueryProvider, SessionWrapper } from './providers'
 
@@ -47,14 +49,18 @@ export const viewport = {
   initialScale: 1.0,
 }
 
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ['latin'],
+  weight: ['100', '300', '400', '500', '700'],
+})
+
 export default function RootLayout({ children, session }) {
   return (
-    <html lang='en' className='h-full'>
-      <body className='bg-[#111111] h-full '>
+    <html lang='en'>
+      <body className={cn(jetbrainsMono.variable, 'bg-[#111111]')}>
         <SessionWrapper session={session}>
           <QueryProvider>
             <Navbar />
-
             {children}
             <Analytics />
             <SpeedInsights />

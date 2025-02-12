@@ -18,6 +18,11 @@ export default async function getRepoStars(owner, repo) {
     body: JSON.stringify({ query }),
   })
 
-  const data = await response.json()
-  return data.data.repository.stargazers.totalCount
+  const result = await response.json()
+
+  if (!result.data || !result.data.repository) {
+    return null
+  }
+
+  return result.data.repository.stargazers.totalCount
 }
