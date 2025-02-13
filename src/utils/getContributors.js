@@ -40,10 +40,15 @@ export default async function getContributors(owner, repo) {
     body: JSON.stringify({ query }),
   })
 
-  const { data } = await response.json()
+  const result = await response.json()
+  const { data } = result
+
+  if (!data || !data.repository) {
+    return null
+  }
 
   if (!data.repository.defaultBranchRef) {
-    throw new Error('Branch not found')
+    return null
   }
 
   const commits = data.repository.defaultBranchRef.target.history.edges

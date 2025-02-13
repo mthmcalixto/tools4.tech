@@ -42,16 +42,17 @@ export default async function Home() {
               Project Statistics
             </h2>
             <div className='flex justify-center gap-9'>
-              <div className='flex flex-col items-center'>
-                <span className='text-4xl font-bold text-white'>{stars}</span>
-                <span className='text-sm text-gray-400 flex items-center gap-2'>
-                  <span>
-                    <FaGithub size={20} />
-                  </span>{' '}
-                  GitHub Stars
-                </span>
-              </div>
-
+              {stars !== null && (
+                <div className='flex flex-col items-center'>
+                  <span className='text-4xl font-bold text-white'>{stars}</span>
+                  <span className='text-sm text-gray-400 flex items-center gap-2'>
+                    <span>
+                      <FaGithub size={20} />
+                    </span>{' '}
+                    GitHub Stars
+                  </span>
+                </div>
+              )}
               <Link
                 href='/contributors'
                 className='flex flex-col items-center hover:text-white transition-colors duration-300'

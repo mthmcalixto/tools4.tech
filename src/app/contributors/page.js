@@ -1,5 +1,6 @@
 import CardsContributors from '@/components/CardsContributors'
 import getContributors from '@/utils/getContributors'
+import { BiErrorCircle } from 'react-icons/bi'
 
 export const metadata = {
   title: 'Project Contributors - Tools4.tech',
@@ -7,6 +8,23 @@ export const metadata = {
 
 export default async function Contributors() {
   const data = await getContributors('mateusarcedev', 'tools4.tech')
+
+  if (!data) {
+    return (
+      <div className='bg-[#111] text-gray-300 h-screen flex items-center justify-center'>
+        <div className='text-center space-y-4'>
+          <BiErrorCircle className='text-4xl mx-auto' />
+          <h1 className='text-2xl font-bold text-white'>
+            Contributors Not Found
+          </h1>
+          <p className='text-gray-400'>
+            We couldn’t find any contributors for this repository. Please check
+            the repository name or try again later.
+          </p>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className='bg-[#111] text-gray-300'>

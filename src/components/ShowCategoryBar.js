@@ -1,14 +1,22 @@
 import { headers } from 'next/headers'
+import { TbMoodEmpty } from 'react-icons/tb'
 import Category from './Category'
 
 const getCategories = async () => {
-  const response = await fetch(`${process.env.URL_API}/categories`, {
-    method: 'GET',
-  })
+  try {
+    const response = await fetch(`${process.env.URL_API}/categories`, {
+      method: 'GET',
+    })
 
-  const data = await response.json()
+    if (!response.ok) {
+      throw new Error(`Failed to fetch categories: ${response.statusText}`)
+    }
 
-  return data
+    const data = await response.json()
+    return data
+  } catch (error) {
+    return []
+  }
 }
 
 export default async function ShowCategoryBar() {
@@ -25,7 +33,7 @@ export default async function ShowCategoryBar() {
     showCategoryBar && (
       <div className='flex flex-col items-center justify-center'>
         <div className='w-full container mx-auto p-5 gap-2 mt-4'>
-          {categories.length === 0 ? (
+          {categories && categories.length === 0 ? (
             <div className='flex justify-center items-center gap-3 flex-col mt-6'>
               <span className='text-5xl text-neutral-700'>
                 <TbMoodEmpty />
