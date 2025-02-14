@@ -1,4 +1,5 @@
 import Card from '@/components/Card'
+import { FaExclamationTriangle } from 'react-icons/fa'
 
 export const metadata = {
   title: 'Tools - Tools4.tech',
@@ -22,15 +23,27 @@ export default async function ToolsPage({ params }) {
 
   const tools = await getToolsByCategory(categoryId)
 
+  if (!tools || tools.length === 0) {
+    return (
+      <div className='flex flex-col justify-center items-center h-screen'>
+        <FaExclamationTriangle className='text-4xl text-red-500 mb-4' />
+        <h2 className='text-xl font-semibold mb-4'>
+          No tools in this category
+        </h2>
+        <p className='text-gray-600'>
+          The selected category has no tools available.
+        </p>
+      </div>
+    )
+  }
+
   return (
     <div className='w-4/5 mx-auto py-8'>
-      {tools?.length > 0 && (
-        <div className='flex flex-wrap items-center justify-center gap-6'>
-          {tools.map(tool => (
-            <Card key={tool.id} tool={tool} />
-          ))}
-        </div>
-      )}
+      <div className='flex flex-wrap items-center justify-center gap-6'>
+        {tools.map(tool => (
+          <Card key={tool.id} tool={tool} />
+        ))}
+      </div>
     </div>
   )
 }

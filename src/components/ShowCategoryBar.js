@@ -3,20 +3,16 @@ import { TbMoodEmpty } from 'react-icons/tb'
 import Category from './Category'
 
 const getCategories = async () => {
-  try {
-    const response = await fetch(`${process.env.URL_API}/categories`, {
-      method: 'GET',
-    })
+  const response = await fetch(`${process.env.URL_API}/categories`, {
+    method: 'GET',
+  })
 
-    if (!response.ok) {
-      throw new Error(`Failed to fetch categories: ${response.statusText}`)
-    }
-
-    const data = await response.json()
-    return data
-  } catch (error) {
+  if (!response.ok) {
     return []
   }
+
+  const data = await response.json()
+  return data
 }
 
 export default async function ShowCategoryBar() {
